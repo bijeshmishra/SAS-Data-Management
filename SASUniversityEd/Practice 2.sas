@@ -72,5 +72,6 @@ PROC PRINT DATA=checkB;
 	TITLE2 "Print mean, median and variance for time modifing 3.";
 	FOOTNOTE "STAT 5193: SAS & R";
 RUN;
-
+DM 'SAVE '
+DM 'LOG; CLEAR;'
 QUIT;

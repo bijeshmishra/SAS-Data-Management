@@ -1,4 +1,5 @@
 DM 'LOG; CLEAR; ODSRESULTS; CLEAR;';
+TITLE; FOOTNOTE;
 
 /*Data Management */
 /*Enter Data */
