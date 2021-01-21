@@ -1,9 +1,9 @@
-DM 'LOG; CLEAR; ODSRESULTS; CLEAR;';
+DM 'LOG; CLEAR; ODSRESULTS; CLEAR; OUTPUT; CLEAR; PGM; CLEAR; ';
+TITLE; FOOTNOTE;
 
 DATA prac2;
 	INPUT program $ gender $ time @@;
 
-	/* Variables, $ = Character, @@ = Value Reoccuring */
 	DATALINES;
 R M 55.7 B M 64.3 B M 48.9 T F 67.2
 T F 65.6 T F 60.5 R M 72.0 R M 52.7
@@ -13,9 +13,11 @@ T M 71.2 B M 56.9 B F 68.4 R M 50.9
 R F 45.7 T M 69.9 B M 77.5 R F 53.4
 ;
 
+/*
 PROC PRINT DATA=prac2;
 	TITLE " Practice 2, Data, Bijesh Mishra";
 	FOOTNOTE "STAT 5193: SAS & R";
+*/
 
 PROC UNIVARIATE DATA=prac2;
 	VAR time;
@@ -33,8 +35,6 @@ PROC PRINT DATA=checkA;
 PROC SORT DATA=prac2;
 	BY gender;
 	* ODS SELECT BASICINTERVALS;
-
-	/* Generates basic interval table only. */
 PROC UNIVARIATE DATA=prac2 CIBASIC (ALPHA=0.02);
 	CLASS gender;
 	VAR time;
@@ -54,7 +54,7 @@ PROC SORT DATA=prac2;
 	BY gender;
 	ODS SELECT HISTOGRAM;
 
-	/* Generates histograms only */
+	/* GENERATES HISTOGRAM ONLY */
 PROC UNIVARIATE DATA=prac2;
 	HISTOGRAM Time / NORMAL(PERCENTS=20 40 60 80 MIDPERCENTS) ODSTITLE=TITLE;
 	VAR time;
@@ -72,6 +72,6 @@ PROC PRINT DATA=checkB;
 	TITLE2 "Print mean, median and variance for time modifing 3.";
 	FOOTNOTE "STAT 5193: SAS & R";
 RUN;
-DM 'SAVE '
-DM 'LOG; CLEAR;'
+DM 'SAVE ';
+DM 'LOG; CLEAR;';
 QUIT;
