@@ -1,0 +1,185 @@
+/* Chapter 17 */
+DM 'LOG; CLEAR; ODSRESULTS; CLEAR;';
+TITLE "chapter 17, Bijesh Mishra";
+DATA beef; 
+Input DMI ADG CWT BackFat REA; 
+DATALINES; 
+17.0090 3.05 819.000 0.54571 13.3821 
+21.4372 3.25 859.000 0.52818 13.9649 
+; 
+
+PROC GCHART DATA=demo.beef 3 ;
+VBAR sex / GROUP=producer;
+TITLE 'Objective 17.1';
+RUN;
+
+TITLE;
+PATTERN;
+GOPTIONS FTEXT="Times New Roman";
+PROC GCHART DATA = demo.beef3;
+VBAR producer / DISCRETE TYPE = MEAN SUMVAR = rea PATTERNID = MIDPOINT,
+TITLE 'Objective 17.2 - Chart 1';
+PATTERN1 COLOR = BLACK VALUE = SOLID;
+PATTERN2 COLOR = BLACK VALUE = EMPTY;
+PATTERN3 COLOR = BLACK VALUE = X3;
+RUN;
+VBAR producer / DISCRETE TYPE = MEAN SUMVAR = rea PATTERNID = MIDPOINT
+GROUP = sex;
+TITLE 'Objective 17.2 - Chart 2';
+RUN;
+VBAR sex / TYPE = MEAN SUMVAR = rea PATTERNID = GROUP GROUP = producer;
+TITLE 'Objective 17.2 - Chart 3' ;
+RUN;
+
+TITLE;
+PATTERN;
+GOPTIONS PTEXT="Times New Roman" HTEXT = 1.5;
+PROC GCHART DATA = demo.beef3 ;
+VBAR producer / DISCRETE SUBGROUP = sex PATTERNID = SUBGROUP;
+TITLE 'Objective 17.3';
+PATTERN1 COLOR = GRAY VALUE = SOLID ; *heifers;
+PATTERN2 COLOR = GRAY VALUE = EMPTY ; *steers;
+RUN;
+
+PROC GCHART DATA = demo.beef3;
+VBAR sex / SUBGROUP = producer PATTERNID = SUBGROUP;
+PATTERN1 COLOR = GRAY VALUE = SOLID ; * Producer=l ;
+PATTERN2 COLOR = GRAY VALUE = EMPTY ; *Producer=2;
+PATTERN3 COLOR = GRAY VALUE = X3 ; *Producer=3;
+RUN;
+
+GOPTIONS FTEXT = SWISSB HTEXT = l.5;
+PROC GCHART DATA = demo.beef3;
+PIE producer / DISCRETE TYPE = PERCENT VALUE = INSIDE SLICE = OUTSIDE;
+TITLE 'Objective 17.4 Pi Chart - Percent';
+PATTERN1 COLOR = GRAY VALUE = EMPTY;
+PATTERN2 COLOR = GRAY VALUE = SOLID;
+PATTERN3 COLOR = SILVER VALUE = EMPTY;
+RUN;
+PIE producer / DISCRETE TYPE = FREQ VALUE = INSIDE;
+TITLE 'Objective l7.4: Pie Chart - FREQ';
+RUN;
+
+GOPTIONS RESET=ALL;
+PROC GPLOT DATA=demo.beef3 ;
+WHERE producer = 3;
+PLOT cwt * dmi ;
+SYMBOL1 VALUE = DOT CV = BLACK I = NONE;
+TITLE 'Objective 17.5';
+RUN;
+
+AXIS1 ORDER = (700 TO 1000 BY 50) LABEL = (A=90);
+PROC GPLOT DATA = demo.beef3;
+PLOT cwt * dmi = sex / VAXIS = AXISl;
+SYMBOL1 VALUE = CIRCLE CV = BLACK I = NONE; *heifers;
+SYMBOL2 VALUE = TRIANGLE CV = BLACK I = NONE; *steers;
+TITLE "Objective 17.6 - Option 1";
+RUN;
+PLOT cwt * dmi = sex / VAXIS = AXIS1 GRID;
+SYMBOL1 VALUE = "H" CV = BLACK I = NONE;
+SYMBOL2 VALUE = "S" CV = BLACK I = NONE;
+TITLE 'Objective 17.6 - Option 2';
+RUN;
+
+PROC GPLOT DATA = demo.beef3means;
+WHERE _STAT_ = "MEAN";
+PLOT cwt * producer = sex / VAXIS = AXIS1;
+SYMBOL1 VALUE = DOT CV = BLACK I = JOIN L = 1;
+SYMBOL2 VALUE = NONE C = BLACK I = JOIN L = 3;
+TITLE 'Objective 17.7';
+RUN;
+
+LEGEND1 POSITION = (TOP INSIDE) LABEL = NONE;
+LEGEND2 POSITION = ( TOP RIGHT OUTSIDE );
+LEGEND3 POSITION = ( TOP RIGHT INSIDE ) ACROSS = 1;
+LEGEND4 POSITION = (LEFT) ;
+LEGEND5 POSITION = (LEFT) D0WN = 4 LABEL = ("Gender");
+
+GOPTIONS FTEXT = "Arial" HTEXT = 1.5 CTEXT = BLACK;
+AXIS2 ORDER = (700 TO 875 BY 25) ;
+PROC GPLOT DATA = demo.beef3means ;
+WHERE _STAT_ = "MEAN";
+PLOT cwt * producer = sex / VAXIS = AXIS2 LEGEND = LEGEND3 ;
+SYMBOL1 VALUE = DOT CV = BLACK I = JOIN L = 1 ;
+SYMBOL2 VALUE = NONE C = BLACK I = JOIN L = 3 ;
+TITLE 'Objective 17.8 - Legend 3';
+RUN;
+PLOT cwt * producer = sex / VAXIS = AXIS2 LEGEND = LEGEND5 ;
+TITLE 'Objective 17.8 - Legend 5';
+RUN;
+
+GOPTIONS RESET = ALL FTEXT = ZAPF;
+LEGEND1 POSITION = (TOP INSIDE) LABEL = NONE;
+AXIS3 LABEL = NONE;
+AXIS4 LABEL =(A = 90) ;
+AXIS5 LABEL =(A = 270) ;
+PROC GPLOT DATA = demo.beef3 ;
+WHERE producer = 3 ;
+plot (adg dmi) * rea / OVERLAY LEGEND = LEGEND1 VAXIS = AXIS3 ;
+SYMBOL1 VALUE = CIRCLE CV = BLACK I = NONE;
+SYMBOL2 VALUE = DOT CV = BLACK I = NONE;
+TITLE 'Objective 17.9 - OVERLAY Option';
+RUN;
+PLOT adg * rea / VAXIS = AXIS4 LEGEND = LEGEND6;
+PLOT2 dmi * rea / LEGEND = LEGEND1 VAXIS = AXIS5;
+TITLE 'Objective 17.9 - PL0T2 Statement';
+RUN;
+
+GOPTIONS RESET = ALL;
+PROC G3D DATA = demo.beef3;
+WHERE producer = 3 and sex = "H";
+SCATTER adg * dmi = cwt ;
+TITLE 'Objective 17.10 - Default G3D Scatter Plot';
+RUN;
+
+PROC SORT DATA=demo.beef3;
+by sex;
+PROC G3D DATA=detno.beef3 ;
+WHERE producer = 3;
+BY sex;
+SCATTER adg * dmi = cwt / ZMIN = 700 ZMAX = 1000 
+						ZTICKNUM = 7 GRID 
+						SHAPE = "PILLAR" COLOR = "GRAY";
+TITLE 'Objective 17.11';
+RUN;
+
+DATA twelve;
+X = -2.5;
+y = -1;
+DO X = -2.5 TO 2.5 BY 0.1;
+DO y = -1 TO 1 BY 0.1;
+z =  X*X*X + 3*X*Y*Y + 3*Y*Y - 15*X;
+OUTPUT;
+END;
+END;
+RUN;
+
+PROC G3GRID DATA = twelve;
+grid y * X = Z;
+
+PROC G3D DATA = twelve;
+PLOT y * X = z / GRID;
+TITLE 'Objective 17.12 - View 1' ;
+RUN;
+
+PROC G3GRID DATA = twelve;
+grid X * y = z;
+
+PROC G3D DATA = twelve;
+PLOT X * y = z / GRID XYTYPE = 2
+					  XTICKNUM = 6
+					  ZMIN = -25
+					  ZMAX = 25
+					  ZTICKNUM = 11 ;
+TITLE 'Objective 17.12 - View 2' ;
+RUN; QUIT;
+
+PROC GCONTOUR DATA = twelve;
+PLOT X * y = z / AUTOLABEL NOLEGEND
+				 LEVELS = -20 -15 -10 -5 0 5 10 15 20;
+SYMBOL1 I = JOIN C = BLACK L = 1 REPEAT = 9;
+TITLE 'Objective 17.13 - Contour Plot for View 2' ;
+RUN;
+
+ODS LISTING;
+ODS LISTING CLOSE;
